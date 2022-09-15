@@ -7,7 +7,8 @@ const {
     getAllPosts,
     getPostsByUser,
     updatePost,
-    createPost
+    createPost,
+    createTags
 } = require('./index');
 
 const dropTables = async () => {
@@ -15,6 +16,8 @@ const dropTables = async () => {
       console.log("Starting to drop tables...");
 
         await client.query(`
+          DROP TABLE IF EXISTS post_tags;
+          DROP TABLE IF EXISTS tags;
           DROP TABLE IF EXISTS posts;
           DROP TABLE IF EXISTS users;
         `);
@@ -47,6 +50,18 @@ const createTables = async () => {
           content TEXT NOT NULL,
           active BOOLEAN DEFAULT true
         );
+
+        CREATE TABLE tags (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) UNIQUE NOT NULL
+        );
+
+        CREATE TABLE post_tags (
+          id SERIAL PRIMARY KEY,
+          "postId" INTEGER REFERENCES posts(id) UNIQUE NOT NULL,
+          "tagId" INTEGER REFERENCES tags(id) UNIQUE NOT NULL
+        );
+
       `);
 
       console.log("Finished building tables.");
@@ -70,7 +85,7 @@ const createInitialUsers = async () => {
       username: 'sandra', 
       password: '2sandy4me',
       name: 'Just Sandra',
-      location: 'Ain\'t tellin\''
+      location: "Ain't tellin'"
     });
     await createUser({ 
       username: 'glamgal',
@@ -151,11 +166,14 @@ const testDB = async () => {
     const updatePostResult = await updatePost(posts[0].id, {
       title: "New Title",
       content: "Editing this post for good measure!"
-    })
+    });
     console.log("Result:", updatePostResult);
 
     const albert = await getUserById(1);
-    console.log("Result:", albert)
+    console.log("Result:", albert);
+
+    const createTagsResult = await createTags(["#awesome", "#cool", "#rad"]);
+    console.log("Create tags result:", createTagsResult);
 
     console.log("Finished database tests.");
   } catch (err) {

@@ -145,6 +145,39 @@ const getPostsByUser = async (userId) => {
   }
 }
 
+const createTags = async (tagList) => {
+  if (tagList.length === 0) { 
+    return; 
+  }
+
+  const insertValues = tagList.map(
+    (_, index) => `$${index + 1}`).join('), (');
+
+  // need something like $1, $2, $3
+  const selectValues = tagList.map(
+    (_, index) => `$${index + 1}`).join(', ');
+
+  try {
+    await client.query(`
+      INSERT INTO tags(name)
+      VALUES (${ insertValues })
+      ON CONFLICT (name) DO NOTHING;
+    `, tagList);
+
+    const { rows } = await client.query(`
+      SELECT * 
+      FROM tags
+      WHERE name IN (${ selectValues });
+    `, tagList);
+
+    return rows;
+    // select all tags where the name is in our taglist
+    // return the rows from the query
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   client,
   getAllUsers,
@@ -154,5 +187,6 @@ module.exports = {
   getAllPosts,
   getPostsByUser,
   updatePost,
-  createPost
+  createPost,
+  createTags
 }
