@@ -94,7 +94,7 @@ const createInitialUsers = async () => {
       location: 'Upper East Side'
     });
 
-    console.log("Finished creating users!");
+    console.log("Finished creating users.");
   } catch (err) {
     console.error("Error creating users.");
     throw err;
@@ -134,30 +134,6 @@ const createInitialPosts = async () => {
   }
 }
 
-// const createInitialTags = async () => {
-//   try {
-//     console.log('Starting to create tags...');
-
-//     const [happy, sad, inspo, catman] = await createTags([
-//       '#happy',
-//       '#worst-day-ever',
-//       '#youcandoanything',
-//       '#catmandoeverything'
-//     ]);
-
-//     const [postOne, postTwo, postThree] = await getAllPosts();
-
-//     await addTagsToPost(postOne.id, [happy, inspo]);
-//     await addTagsToPost(postTwo.id, [sad, inspo]);
-//     await addTagsToPost(postThree.id, [happy, catman, inspo]);
-//     console.log("POST ONE: ", await happy, sad, inspo, catman);
-
-//     console.log('Finished creating tags.');
-//   } catch (err) {
-//     console.log('Error creating tags.');
-//     throw err;
-//   }
-// }
 
 const rebuildDB = async () => {
   try {
@@ -176,6 +152,7 @@ const testDB = async () => {
   try {
     console.log("Starting the test database...");
 
+    console.log("Getting all users...")
     const users = await getAllUsers();
     console.log("Get Users Result:", users);
 
@@ -203,14 +180,17 @@ const testDB = async () => {
     });
     console.log("Update Post Tags Result: ", updatePostTagsResult)
 
+    console.log("Getting user by ID: 1...")
     const albert = await getUserById(1);
     console.log("Get User By ID Result:", albert);
 
+    console.log("Getting post by ID: 3...")
     const getPostByIdResult = await getPostById(3)
-    console.log("Get Posts By ID Result:", getPostByIdResult);
+    console.log("Get Post By ID Result:", getPostByIdResult);
 
-    const getPostsByTagNameResult = await getPostsByTagName("#happy")
-    console.log("Get Posts By Tag Name Result: ", getPostsByTagNameResult) 
+    console.log("Getting posts by tag name #happy...")
+    const getPostsByHappyTag = await getPostsByTagName("#happy")
+    console.log("Get Posts By Tag Name Result: ", getPostsByHappyTag) 
 
     console.log("Finished database tests.");
   } catch (err) {

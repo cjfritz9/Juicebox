@@ -30,7 +30,6 @@ const updateUser = async (id, fields = {}) => {
   const setString = Object.keys(fields).map(
     (key, index) => `"${ key }"=$${ index + 1}`
   ).join(', ');
-
   if (setString.length === 0) {
     return;
   }
@@ -55,7 +54,7 @@ const getAllUsers = async () => {
         FROM users;
         `);
 
-        return rows;
+    return rows;
 }
 
 const getUserById = async (userId) => {
@@ -65,11 +64,9 @@ const getUserById = async (userId) => {
     FROM users
     WHERE id = ${ userId }
   `);
-
   !user ? null : user.posts = await getPostsByUser(userId)
 
   return user;
-
   } catch (err) {
     throw err;
   }
@@ -212,23 +209,11 @@ const createTags = async (tagList) => {
   if (tagList.length === 0) { 
     return; 
   }
-
   const insertValues = tagList.map(
     (_, index) => `$${index + 1}`).join('), (');
-//                                 add multiple rows
-// ['#awesome', '#cool', '#rad']
-// ['$1', '$2', '$3']
-// '$1), ($2), ($3'
-// three seperate rows, single column
 
   const selectValues = tagList.map(
     (_, index) => `$${index + 1}`).join(', ');
-//                                 add multiple columns
-
-// ['#awesome', '#cool', '#rad']
-// ['$1', '$2', '$3']
-// '$1, $2, $3'
-// three seperate columns, single row
 
   try {
     await client.query(`
@@ -237,14 +222,12 @@ const createTags = async (tagList) => {
       ON CONFLICT (name) DO NOTHING;
     `, tagList);
 
-    // ON CONFLICT: don't insert new tag
-
     const { rows } = await client.query(`
       SELECT (id), (name)
       FROM tags
       WHERE (name) IN (${ selectValues });
     `, tagList);
-    console.log(rows)
+
     return rows;
   } catch (err) {
     throw err;
@@ -269,7 +252,6 @@ const addTagsToPost = async (postId, tagList) => {
     const createPostTagPromises = tagList.map(
       tag => createPostTag(postId, tag.id)
     );
-
     await Promise.all(createPostTagPromises);
     
     return await getPostById(postId);
